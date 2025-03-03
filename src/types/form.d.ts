@@ -1,6 +1,6 @@
 import { type FormRules, type TnFormInstance, type TnActionSheetInstance } from "@tuniao/tnui-vue3-uniapp";
 
-export interface FormItem {
+export interface BaseFormItem {
     /**
      * @description 表单类型
      */
@@ -44,12 +44,44 @@ export interface FormItem {
     /**
      * @description 初始值,当传入select等选择器类型时必填
      */
-    default?: any;
-    /**
-     * @description 输入框点击事件
-     */
-    click:
+  
 }
+
+export interface SelectFormItem extends BaseFormItem {
+    /**
+     * @description 选择器类型
+     */
+    type: 'select',
+    /**
+     * @description 默认值
+     */
+    default: Array<T>,
+    /**
+     * @description 选择器标题
+     */
+    title: string,
+    /**
+     * @description 取消按钮的文本
+     */
+    cancelText?:string,
+    /**
+     * @description 是否显示遮罩层
+     */
+    mask?:boolean
+    /**
+     * @description 点击遮罩层是否关闭选择器
+     */
+    maskClosable?:boolean,
+    /**
+     * @description 点击事件
+     */
+    click?: (value:T) => void,
+}
+export function isSelectFormItem(item: FormItem): item is SelectFormItem {
+    return item.type === 'select';
+}
+export type FormItem = BaseFormItem | SelectFormItem;
+
 
 export interface FormSettings {
     /**

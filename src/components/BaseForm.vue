@@ -12,34 +12,37 @@ import {
 	TnActionSheet,
 } from "@tuniao/tnui-vue3-uniapp";
 import type { FormSettings, TnFormInstance, TnActionSheetInstance } from "../types/form";
-
+import { isSelectFormItem } from "../types/form";
 const props = defineProps<{ settings?: FormSettings }>();
 const data = defineModel<{ [key: string]: any }>("data", { required: true });
 
 const formRef = ref<TnFormInstance>();
-const actionSheetRefs = ref<{[key:string]: any}>({});
+const actionSheetRefs = ref<Record<string, TnActionSheetInstance>>({});
 
-//表单的校验规则
+//Form Validation
 const formRules = computed(() => {
 	return props?.settings?.rules;
 });
 
-//表单的配置项
+//Form Items
 const formItem = computed(() => {
-	return props?.settings?.items;
+	return props.settings?.items || []
 });
 
-//动态设置ref
+//Dynamic Actionsheet
 // const setActionSheetRefs = (el: any, prop: string) => {
 // 	actionSheetRefs.value.push(el)
 // };
 
-动态打开actionsheet
 const openActionSheet = (prop:string) => {
-	actionSheetRefs.value[prop]?.value.show({
-		actions: formItem[prop]?.default || [],
-		title:
-	})
+	const selectProps = formItem.value.find((item)=> (item.prop === prop));
+	if(selectProps && isSelectFormItem(selectProps)){
+		actionSheetRefs.value[prop]?.value.show({
+			actions: selectProps.default,
+			title: selectProps.title,
+			select:
+		})
+	}
 }
 
 onMounted(() => {});
@@ -76,7 +79,7 @@ onMounted(() => {});
 						:border="item.border || false"
 						:textAlign="item.textAlign || 'left'"
 						:underline="item.underline || false"
-						@click="item.select"
+						@click="item.click(data[item.prop])"
 					>
 						<template #suffix>
 							<TnIcon name="right"></TnIcon>
@@ -90,7 +93,7 @@ onMounted(() => {});
 </template>
 
 <style lang="scss" scoped>
-.basecontainer {
+.base-container {
 	width: 100%;
 	height: 100%;
 }
